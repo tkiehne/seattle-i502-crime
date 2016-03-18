@@ -22,5 +22,5 @@ vignettes/*.pdf
 # Rmd Cache files
 *_cache/*
 
-# Data is too large for Github - will be downloaded by script
+# Data is too large for Github - will be zipped
 *.csv

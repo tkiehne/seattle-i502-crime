@@ -75,9 +75,11 @@ img {
 <h2>Data Processing</h2>
 <p>Crime data are available from the City of Seattle in a well organized format that is divided by police sector and crime type. This specific data set is based on initial police reports taken by officers when responding to incidents around the city. It is worth noting that this analysis is based on data collected when police are dispatched to investigate a crime report, which implies that unreported crime is not represented. However, it is assumed that any increase in unreported crime would induce a similar signal in reported crime.</p>
 <p>Data are read directly from the City of Seattle site for processing:</p>
-<pre class="r"><code>library(dplyr, warn.conflicts=F, quietly=T)
-
-# get data
+<pre class="r"><code>if(!file.exists(&quot;Seattle_Police_Department_Police_Report_Incident.csv&quot;) &amp;
+   file.exists(&quot;Seattle_Police_Department_Police_Report_Incident.zip&quot;))
+{
+  unzip(&quot;Seattle_Police_Department_Police_Report_Incident.zip&quot;)
+}
 if(!file.exists(&quot;Seattle_Police_Department_Police_Report_Incident.csv&quot;))
 {
   download.file(&quot;https://data.seattle.gov/api/views/7ais-f98f/rows.csv?accessType=DOWNLOAD&quot;, &quot;Seattle_Police_Department_Police_Report_Incident.csv&quot;, method=&quot;internal&quot;, mode=&quot;w&quot;)
@@ -97,16 +99,35 @@ crime &lt;- filter(crime, Date.Reported &gt;= &quot;2008-01-01&quot;)
 crime &lt;- filter(crime, District.Sector %in% c(&quot;E&quot;, &quot;C&quot;, &quot;G&quot;, &quot;R&quot;, &quot;S&quot;))</code></pre>
 <p>Then we filter out all crimes that are not related to violent crimes, weapons, weapons discharge, and narcotics; marijuana related crimes are specifically excluded to avoid bias between the before and after I-502 period:</p>
 <pre class="r"><code># specific crimes only
-crimefilter &lt;- c(&quot;ASSLT-AGG-BODYFORCE&quot;, &quot;ASSLT-AGG-GUN&quot;, &quot;ASSLT-AGG-WEAPON&quot;, &quot;ASSLT-OTHER&quot;, &quot;DRIVE-BY&quot;, &quot;HOMICIDE-JUST-GUN&quot;, &quot;HOMICIDE-JUST-WEAPON&quot;, &quot;HOMICIDE-NEG-MANS-BODYFORCE&quot;, &quot;HOMICIDE-NEG-MANS-GUN&quot;, &quot;HOMICIDE-PREMEDITATED-BODYFORC&quot;, &quot;HOMICIDE-PREMEDITATED-GUN&quot;, &quot;NARC-DISTRIBUTE-HALLUCINOGEN&quot;, &quot;NARC-DRUG TRAFFIC LOITERING&quot;, &quot;NARC-EQUIPMENT/PARAPHENALIA&quot;, &quot;NARC-FORGERY-PRESCRIPTION&quot;, &quot;NARC-FOUND-AMPHETAMINE&quot;, &quot;NARC-FOUND-COCAINE&quot;, &quot;NARC-FOUND-HALLUCINOGEN&quot;, &quot;NARC-FOUND-HEROIN&quot;, &quot;NARC-FOUND-METH&quot;, &quot;NARC-FOUND-OPIUM&quot;, &quot;NARC-FOUND-PILL/TABLET&quot;, &quot;NARC-FOUND-SYNTHETIC&quot;, &quot;NARC-FRAUD-PRESCRIPTION&quot;, &quot;NARC-MANUFACTURE-HALLUCINOGEN&quot;, &quot;NARC-MANUFACTURE-OTHER&quot;, &quot;NARC-POSSESS-AMPHETAMINE&quot;, &quot;NARC-POSSESS-BARBITUATE&quot;, &quot;NARC-POSSESS-COCAINE&quot;, &quot;NARC-POSSESS-HALLUCINOGEN&quot;, &quot;NARC-POSSESS-HEROIN&quot;, &quot;NARC-POSSESS-METH&quot;, &quot;NARC-POSSESS-OPIUM&quot;, &quot;NARC-POSSESS-PILL/TABLET&quot;, &quot;NARC-POSSESS-PRESCRIPTION&quot;, &quot;NARC-POSSESS-SYNTHETIC&quot;, &quot;NARC-SELL-AMPHETAMINE&quot;, &quot;NARC-SELL-BARBITUATE&quot;, &quot;NARC-SELL-COCAINE&quot;, &quot;NARC-SELL-HALLUCINOGEN&quot;, &quot;NARC-SELL-HEROIN&quot;, &quot;NARC-SELL-METH&quot;, &quot;NARC-SELL-OPIUM&quot;, &quot;NARC-SELL-PILL/TABLET&quot;, &quot;NARC-SELL-PRESCRIPTION&quot;, &quot;NARC-SELL-SYNTHETIC&quot;, &quot;NARC-SMUGGLE-COCAINE&quot;, &quot;NARC-SMUGGLE-METH&quot;, &quot;NARC-SMUGGLE-OTHER&quot;, &quot;ROBBERY-RESIDENCE-GUN&quot;, &quot;ROBBERY-RESIDENCE-WEAPON&quot;, &quot;ROBBERY-STREET-BODYFORCE&quot;, &quot;ROBBERY-STREET-GUN&quot;, &quot;ROBBERY-STREET-WEAPON&quot;, &quot;THREATS-KILL&quot;, &quot;THREATS-OTHER&quot;, &quot;THREATS-WEAPON&quot;, &quot;WEAPON-CONCEALED&quot;, &quot;WEAPON-DISCHARGE&quot;, &quot;WEAPON-POSSESSION&quot;, &quot;WEAPON-SELLING&quot;, &quot;WEAPON-SURRENDER-EXCLUDING FIR&quot;, &quot;WEAPON-UNLAWFUL USE&quot;)
+crimefilter &lt;- c(&quot;ASSLT-AGG-BODYFORCE&quot;, &quot;ASSLT-AGG-GUN&quot;, &quot;ASSLT-AGG-WEAPON&quot;, &quot;ASSLT-OTHER&quot;,
+                 &quot;DRIVE-BY&quot;, &quot;HOMICIDE-JUST-GUN&quot;, &quot;HOMICIDE-JUST-WEAPON&quot;,
+                 &quot;HOMICIDE-NEG-MANS-BODYFORCE&quot;, &quot;HOMICIDE-NEG-MANS-GUN&quot;, 
+                 &quot;HOMICIDE-PREMEDITATED-BODYFORC&quot;, &quot;HOMICIDE-PREMEDITATED-GUN&quot;,
+                 &quot;NARC-DISTRIBUTE-HALLUCINOGEN&quot;, &quot;NARC-DRUG TRAFFIC LOITERING&quot;,
+                 &quot;NARC-EQUIPMENT/PARAPHENALIA&quot;, &quot;NARC-FORGERY-PRESCRIPTION&quot;,
+                 &quot;NARC-FOUND-AMPHETAMINE&quot;, &quot;NARC-FOUND-COCAINE&quot;, &quot;NARC-FOUND-HALLUCINOGEN&quot;,
+                 &quot;NARC-FOUND-HEROIN&quot;, &quot;NARC-FOUND-METH&quot;, &quot;NARC-FOUND-OPIUM&quot;,
+                 &quot;NARC-FOUND-PILL/TABLET&quot;, &quot;NARC-FOUND-SYNTHETIC&quot;, &quot;NARC-FRAUD-PRESCRIPTION&quot;,
+                 &quot;NARC-MANUFACTURE-HALLUCINOGEN&quot;, &quot;NARC-MANUFACTURE-OTHER&quot;,
+                 &quot;NARC-POSSESS-AMPHETAMINE&quot;, &quot;NARC-POSSESS-BARBITUATE&quot;, &quot;NARC-POSSESS-COCAINE&quot;,
+                 &quot;NARC-POSSESS-HALLUCINOGEN&quot;, &quot;NARC-POSSESS-HEROIN&quot;, &quot;NARC-POSSESS-METH&quot;,
+                 &quot;NARC-POSSESS-OPIUM&quot;, &quot;NARC-POSSESS-PILL/TABLET&quot;, &quot;NARC-POSSESS-PRESCRIPTION&quot;,
+                 &quot;NARC-POSSESS-SYNTHETIC&quot;, &quot;NARC-SELL-AMPHETAMINE&quot;, &quot;NARC-SELL-BARBITUATE&quot;,
+                 &quot;NARC-SELL-COCAINE&quot;, &quot;NARC-SELL-HALLUCINOGEN&quot;, &quot;NARC-SELL-HEROIN&quot;,
+                 &quot;NARC-SELL-METH&quot;, &quot;NARC-SELL-OPIUM&quot;, &quot;NARC-SELL-PILL/TABLET&quot;,
+                 &quot;NARC-SELL-PRESCRIPTION&quot;, &quot;NARC-SELL-SYNTHETIC&quot;, &quot;NARC-SMUGGLE-COCAINE&quot;,
+                 &quot;NARC-SMUGGLE-METH&quot;, &quot;NARC-SMUGGLE-OTHER&quot;, &quot;ROBBERY-RESIDENCE-GUN&quot;,
+                 &quot;ROBBERY-RESIDENCE-WEAPON&quot;, &quot;ROBBERY-STREET-BODYFORCE&quot;, &quot;ROBBERY-STREET-GUN&quot;,
+                 &quot;ROBBERY-STREET-WEAPON&quot;, &quot;THREATS-KILL&quot;, &quot;THREATS-OTHER&quot;, &quot;THREATS-WEAPON&quot;,
+                 &quot;WEAPON-CONCEALED&quot;, &quot;WEAPON-DISCHARGE&quot;, &quot;WEAPON-POSSESSION&quot;, &quot;WEAPON-SELLING&quot;,
+                 &quot;WEAPON-SURRENDER-EXCLUDING FIR&quot;, &quot;WEAPON-UNLAWFUL USE&quot;)
 
 crime &lt;- filter(crime, Offense.Type %in% crimefilter)</code></pre>
 </div>
 <div id="results" class="section level2">
 <h2>Results</h2>
 <p>Using the prepared data, we can look visually at the reported crime trends in the East and South precincts from 2008-2014. A linear trend line is shown in red and the date of the first I-502 shop opening in Seattle (July 8, 2014) is indicated by the vertical black line.</p>
-<pre class="r"><code>library(lattice)
-
-rate0815 &lt;- aggregate(RMS.CDW.ID ~ Date.Reported, data=crime, FUN=length)
+<pre class="r"><code>rate0815 &lt;- aggregate(RMS.CDW.ID ~ Date.Reported, data=crime, FUN=length)
 xyplot(RMS.CDW.ID ~ Date.Reported, data=rate0815,
        panel=function(x, y, col, ...) {
          panel.xyplot(x, y, col=&quot;blue&quot;, ...)
